@@ -1,4 +1,26 @@
 # 🏠 Vehicle Hub
+---
+
+## API
+
+### Manufacturer
+
+- **Endpoint:** `/api/v1/manufacturers`
+- **Method:** `GET`
+- **Description:**  Manufact Manufacturer API.
+- **Authentication:** Not required.
+
+- **Endpoint:** `/api/v1/manufacturers/:id`
+- **Method:** `GET`
+- **Description:** Models under the manufacturer
+- **Authentication:** Not required.
+
+### Model
+
+- **Endpoint:** `/api/v1/models/:id`
+- **Method:** `GET`
+- **Description:** Years under the model.
+- **Authentication:** Not required.
 
 ---
 
