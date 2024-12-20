@@ -3,12 +3,14 @@
 
 ## API
 
-### Manufacturer
+### Manufacturers
 
 - **Endpoint:** `/api/v1/manufacturers`
 - **Method:** `GET`
 - **Description:**  Manufact Manufacturer API.
 - **Authentication:** Not required.
+
+### Manufacturers Models
 
 - **Endpoint:** `/api/v1/manufacturers/:id`
 - **Method:** `GET`
