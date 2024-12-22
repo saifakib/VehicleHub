@@ -42,13 +42,17 @@ Make sure you have the following installed:
    cd VehicleHub
    ```
 **Install dependencies**
-```bash
+   ```bash
    npm install
-```
+   ```
 **Run dependency database docker compose**
-```bash
+   ```bash
    docker compose up -d
-```
+   ```
+**Run seed file**
+   ```bash
+   node seed.js
+   ```
 Create a .env file in the root directory using .env.example as a template. Configure necessary environment variables.
 **Run this application**
    ```bash
