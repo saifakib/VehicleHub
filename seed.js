@@ -1,152 +1,100 @@
-const mongoose = require('mongoose');
-const dotenv = require('dotenv');
+const mongoose = require("mongoose");
+const dotenv = require("dotenv");
 dotenv.config();
 
 // Import models
-const { Manufacturer, Model: CarModel, Year } = require('./src/model');
+const { Manufacturer, Model: CarModel, Year } = require("./src/model");
 
 // Database connection
 const connectDB = async () => {
   try {
     await mongoose.connect(process.env.connectionURL);
-    console.log('Database Connected!!');
+    console.log("Database Connected!!");
   } catch (err) {
     console.error(err);
     process.exit(1);
   }
 };
 
-// Seed data
-const seedData = async () => {
+const seedDataFromExternal = async () => {
   try {
+    const API_URL =
+      "https://public.opendatasoft.com/api/explore/v2.1/catalog/datasets/all-vehicles-model/records";
+    const LIMIT = 100;
+    const TOTAL_COUNT = 10000; // expected: 47523(paid);
+    let offset = 0;
+    let requestCount = 0;
+
     // Clear existing data
     await Manufacturer.deleteMany({});
     await CarModel.deleteMany({});
     await Year.deleteMany({});
 
-    console.log('Existing data cleared!');
+    console.log("Existing data cleared!");
 
-    // Seed manufacturers
-    const manufacturers = await Manufacturer.insertMany([
-      { name: 'Toyota', country: 'Japan' },
-      { name: 'Ford', country: 'USA' },
-      { name: 'BMW', country: 'Germany' },
-      { name: 'Honda', country: 'Japan' },
-      { name: 'Mercedes-Benz', country: 'Germany' },
-      { name: 'Chevrolet', country: 'USA' },
-      { name: 'Hyundai', country: 'South Korea' },
-      { name: 'Kia', country: 'South Korea' },
-      { name: 'Nissan', country: 'Japan' },
-      { name: 'Volkswagen', country: 'Germany' },
-      { name: 'Subaru', country: 'Japan' },
-      { name: 'Mazda', country: 'Japan' },
-      { name: 'Audi', country: 'Germany' },
-      { name: 'Tesla', country: 'USA' },
-      { name: 'Porsche', country: 'Germany' },
-      { name: 'Jaguar', country: 'UK' },
-      { name: 'Land Rover', country: 'UK' },
-      { name: 'Ferrari', country: 'Italy' },
-      { name: 'Lamborghini', country: 'Italy' },
-      { name: 'Volvo', country: 'Sweden' },
-    ]);
-    
-    console.log('Manufacturers seeded:', manufacturers);
+    while (offset < TOTAL_COUNT) {
+      if (requestCount >= 100) {
+        console.log("Reached 100 requests, pausing for 30 seconds...");
+        await new Promise((resolve) => setTimeout(resolve, 30000));
+        requestCount = 0; // Reset the request count after the pause
+      }
 
-    // Seed models
-    const models = await CarModel.insertMany([
-      // Toyota
-      { name: 'Corolla', manufacturer: manufacturers[0]._id },
-      { name: 'Camry', manufacturer: manufacturers[0]._id },
-      { name: 'RAV4', manufacturer: manufacturers[0]._id },
-      { name: 'Highlander', manufacturer: manufacturers[0]._id },
-    
-      // Ford
-      { name: 'F-150', manufacturer: manufacturers[1]._id },
-      { name: 'Mustang', manufacturer: manufacturers[1]._id },
-      { name: 'Explorer', manufacturer: manufacturers[1]._id },
-      { name: 'Escape', manufacturer: manufacturers[1]._id },
-    
-      // BMW
-      { name: 'X5', manufacturer: manufacturers[2]._id },
-      { name: '3 Series', manufacturer: manufacturers[2]._id },
-      { name: '5 Series', manufacturer: manufacturers[2]._id },
-      { name: 'X3', manufacturer: manufacturers[2]._id },
-    
-      // Honda
-      { name: 'Civic', manufacturer: manufacturers[3]._id },
-      { name: 'Accord', manufacturer: manufacturers[3]._id },
-      { name: 'CR-V', manufacturer: manufacturers[3]._id },
-      { name: 'Pilot', manufacturer: manufacturers[3]._id },
-    
-      // Mercedes-Benz
-      { name: 'C-Class', manufacturer: manufacturers[4]._id },
-      { name: 'E-Class', manufacturer: manufacturers[4]._id },
-      { name: 'GLC', manufacturer: manufacturers[4]._id },
-      { name: 'GLE', manufacturer: manufacturers[4]._id },
-    
-      // Chevrolet
-      { name: 'Silverado', manufacturer: manufacturers[5]._id },
-      { name: 'Camaro', manufacturer: manufacturers[5]._id },
-      { name: 'Equinox', manufacturer: manufacturers[5]._id },
-      { name: 'Traverse', manufacturer: manufacturers[5]._id },
-    
-      // Hyundai
-      { name: 'Elantra', manufacturer: manufacturers[6]._id },
-      { name: 'Sonata', manufacturer: manufacturers[6]._id },
-      { name: 'Tucson', manufacturer: manufacturers[6]._id },
-      { name: 'Santa Fe', manufacturer: manufacturers[6]._id },
-    
-      // Kia
-      { name: 'Sportage', manufacturer: manufacturers[7]._id },
-      { name: 'Sorento', manufacturer: manufacturers[7]._id },
-      { name: 'K5', manufacturer: manufacturers[7]._id },
-      { name: 'Telluride', manufacturer: manufacturers[7]._id },
-    
-      // Nissan
-      { name: 'Altima', manufacturer: manufacturers[8]._id },
-      { name: 'Rogue', manufacturer: manufacturers[8]._id },
-      { name: 'Pathfinder', manufacturer: manufacturers[8]._id },
-      { name: 'Sentra', manufacturer: manufacturers[8]._id },
-    
-      // Volkswagen
-      { name: 'Golf', manufacturer: manufacturers[9]._id },
-      { name: 'Passat', manufacturer: manufacturers[9]._id },
-      { name: 'Tiguan', manufacturer: manufacturers[9]._id },
-      { name: 'Jetta', manufacturer: manufacturers[9]._id },
-    
-      // Tesla
-      { name: 'Model 3', manufacturer: manufacturers[13]._id },
-      { name: 'Model S', manufacturer: manufacturers[13]._id },
-      { name: 'Model X', manufacturer: manufacturers[13]._id },
-      { name: 'Model Y', manufacturer: manufacturers[13]._id },
-    ]);
-    
-    console.log('Models seeded:', models);
+      console.log(`Fetching data from offset ${offset}`);
+      const response = await fetch(
+        `${API_URL}?select=make,model,drive,vclass,year&limit=${LIMIT}&offset=${offset}`
+      );
+      if (!response.ok) {
+        throw new Error(`Failed to fetch data: ${response.statusText}`);
+      }
 
-    // Seed years (shared between multiple models)
-    const years = await Year.insertMany([
-      { year: 2018, models: [models[0]._id, models[10]._id, models[20]._id] },
-      { year: 2019, models: [models[1]._id, models[11]._id, models[21]._id] },
-      { year: 2020, models: [models[2]._id, models[12]._id, models[22]._id] },
-      { year: 2021, models: [models[3]._id, models[13]._id, models[23]._id] },
-      { year: 2022, models: [models[4]._id, models[14]._id, models[24]._id] },
-      { year: 2023, models: [models[5]._id, models[15]._id, models[25]._id] },
-      { year: 2015, models: [models[6]._id, models[16]._id, models[26]._id] },
-      { year: 2016, models: [models[7]._id, models[17]._id, models[27]._id] },
-      { year: 2017, models: [models[8]._id, models[18]._id, models[28]._id] },
-      { year: 2019, models: [models[9]._id, models[19]._id, models[29]._id] },
-      { year: 2024, models: [models[30]._id, models[31]._id, models[32]._id] },
-      { year: 2025, models: [models[33]._id, models[34]._id, models[35]._id] },
-      { year: 2026, models: [models[36]._id, models[37]._id, models[38]._id] },
-      { year: 2027, models: [models[39]._id, models[40]._id, models[41]._id] },
-    ]);
+      const data = await response.json();
+      const results = data.results;
 
-    console.log('Years seeded:', years);
+      for (const record of results) {
+        const { make, model, vclass, year } = record;
 
-    console.log('Database seeded successfully!');
+        // Find or create manufacturer
+        let manufacturer = await Manufacturer.findOne({ name: make });
+        if (!manufacturer) {
+          manufacturer = await Manufacturer.create({ name: make });
+        }
+
+        // Find or create model
+        let carModel = await CarModel.findOne({
+          name: model,
+          manufacturer: manufacturer._id,
+        });
+        if (!carModel) {
+          carModel = await CarModel.create({
+            name: model,
+            vclass,
+            manufacturer: manufacturer._id,
+          });
+        }
+
+        // Find or create year
+        let yearEntry = await Year.findOne({ year });
+        if (!yearEntry) {
+          yearEntry = await Year.create({ year, models: [] });
+        }
+
+        // Add model to year if not already added
+        if (!yearEntry.models.includes(carModel._id)) {
+          yearEntry.models.push(carModel._id);
+          await yearEntry.save();
+        }
+      }
+
+      offset += LIMIT;
+      requestCount++;
+    }
+
+    console.log("Data fetching and insertion completed.");
+    await mongoose.disconnect();
+    console.log("Disconnected from MongoDB");
     process.exit(0);
   } catch (err) {
-    console.error('Error seeding data:', err);
+    console.error("Error seeding data:", err);
     process.exit(1);
   }
 };
@@ -154,7 +102,7 @@ const seedData = async () => {
 // Run the seed script
 const runSeed = async () => {
   await connectDB();
-  await seedData();
+  await seedDataFromExternal();
 };
 
 runSeed();
