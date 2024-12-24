@@ -1,4 +1,5 @@
 # 🏠 Vehicle Hub
+
 ---
 
 ## API
@@ -7,7 +8,7 @@
 
 - **Endpoint:** `/api/v1/manufacturers`
 - **Method:** `GET`
-- **Description:**  Manufact Manufacturer API.
+- **Description:** Manufact Manufacturer API.
 - **Authentication:** Not required.
 
 ### Manufacturers Models
@@ -29,7 +30,9 @@
 ## 🛠️ Installation
 
 ### Prerequisites
+
 Make sure you have the following installed:
+
 - [Node.js](https://nodejs.org/) (v20 or higher recommended)
 - [MongoDB](https://www.mongodb.com/try/download/community)
 - [Docker](https://www.docker.com/) (for Docker setup)
@@ -37,25 +40,41 @@ Make sure you have the following installed:
 ### Local Setup
 
 **Clone the repository** and navigate into the project directory:
-   ```bash
-   git clone https://github.com/saifakib/VehicleHub.git
-   cd VehicleHub
-   ```
+
+```bash
+git clone https://github.com/saifakib/VehicleHub.git
+cd VehicleHub
+```
+
 **Install dependencies**
-   ```bash
-   npm install
-   ```
+
+```bash
+npm install
+```
+
 **Run dependency database docker compose**
-   ```bash
-   docker compose up -d
-   ```
+
+```bash
+docker compose up -d
+```
+
 **Run seed file**
-   ```bash
-   node seed.js
-   ```
+
+```bash
+node seed.js
+```
+
+_Note: It will take a few minutes to complete_
+
 Create a .env file in the root directory using .env.example as a template. Configure necessary environment variables.
 **Run this application**
-   ```bash
-   npm start
-   ```
 
+```bash
+npm start
+```
+
+---
+
+### Credit
+
+[public.opendatasoft.com](https://public.opendatasoft.com/explore/dataset/all-vehicles-model/api/?flg=en-us)
