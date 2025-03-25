@@ -4,6 +4,11 @@ on:
   push:
     branches:
       - master
+  pull_request:
+    branches:
+      - master
+  workflow_dispatch:
+
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
@@ -23,7 +28,7 @@ jobs:
           context: ./
           file: ./Dockerfile
           push: true
-          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/vehiclehub:lastest
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/vehiclehub:latest
 
       - name: Jobs Completed
-        run: echo "jobs completed" s
+        run: echo "jobs completed"
