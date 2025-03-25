@@ -25,8 +25,7 @@ jobs:
           context: ./
           file: ./Dockerfile
           push: true
-          tags:
-            - ${{ secrets.DOCKER_HUB_USERNAME }}/vehiclehub:latest
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/vehiclehub:latest
 
       - name: Jobs Completed
         run: echo "jobs completed"
