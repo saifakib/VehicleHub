@@ -12,10 +12,10 @@ jobs:
 
     steps:
       - name: Pull Docker image
-        run: sudo docker pull ${{ secrets.DOCKER_USERNAME }}/vehicle-hub:latest
+        run: sudo docker pull saifakib/vehicle-hub:latest
 
       - name: Delete Old docker container
         run: sudo docker rm -f cicd-pipeline-container || true
 
       - name: Run Docker Container
-        run: sudo docker run -d -p 4000:4000 --name cicd-pipeline-container ${{ secrets.DOCKER_USERNAME }}/vehicle-hub:latest
+        run: sudo docker run -d -p 4000:4000 --name cicd-pipeline-container saifakib/vehicle-hub:latest
